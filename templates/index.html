@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}All Students{% endblock %}
+
+{% block content %}
+<h1>📋 All Students</h1>
+<p><a href="{{ url_for('add') }}" class="btn btn-primary">➕ Add New Student</a></p>
+
+{% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Branch</th>
+                <th>Year</th>
+                <th>CGPA</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.id }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.email }}</td>
+                <td>{{ s.phone or "—" }}</td>
+                <td>{{ s.branch }}</td>
+                <td>{{ s.year }}</td>
+                <td>{{ "%.2f"|format(s.cgpa) if s.cgpa is not none else "—" }}</td>
+                <td>
+                    <a href="{{ url_for('edit', student_id=s.id) }}" class="btn btn-secondary btn-small">✏️ Edit</a>
+                    <form method="POST" action="{{ url_for('delete', student_id=s.id) }}"
+                          style="display:inline; background:none; padding:0; box-shadow:none; max-width:none;"
+                          onsubmit="return confirm('Delete {{ s.name }}?');">
+                        <button type="submit" class="btn btn-danger btn-small">🗑️ Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p style="margin-top: 15px; color: #6b7280;">Total: {{ students|length }} student(s)</p>
+{% else %}
+    <div class="empty">
+        <h2>No students yet</h2>
+        <p>Click "Add New Student" to get started.</p>
+    </div>
+{% endif %}
+{% endblock %}

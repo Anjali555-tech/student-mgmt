@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+<h1>✏️ Edit Student</h1>
+<p style="color: #6b7280;">Student ID: <strong>{{ student.id }}</strong></p>
+
+<form method="POST" action="{{ url_for('edit', student_id=student.id) }}">
+    <label>Name *</label>
+    <input type="text" name="name" required maxlength="100" value="{{ student.name }}">
+
+    <label>Email *</label>
+    <input type="email" name="email" required maxlength="100" value="{{ student.email }}">
+
+    <label>Phone (optional)</label>
+    <input type="text" name="phone" maxlength="15" value="{{ student.phone or '' }}">
+
+    <label>Branch *</label>
+    <select name="branch" required>
+        {% for b in ["CSE","ECE","EEE","MECH","CIVIL","IT","AIML","DS"] %}
+            <option value="{{ b }}" {% if student.branch == b %}selected{% endif %}>{{ b }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Year *</label>
+    <select name="year" required>
+        {% for y in [1,2,3,4,5] %}
+            <option value="{{ y }}" {% if student.year == y %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+
+    <label>CGPA (optional)</label>
+    <input type="number" name="cgpa" step="0.01" min="0" max="10" value="{{ student.cgpa or '' }}">
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
