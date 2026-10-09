@@ -212,3 +212,75 @@ def delete_student(student_id):
     finally:
         cursor.close()
         conn.close()
+def get_statistics():
+    """Return summary statistics about students."""
+    conn = get_connection()
+    if not conn:
+        return None
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        # Total + CGPA stats
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total,
+                AVG(cgpa) AS avg_cgpa,
+                MAX(cgpa) AS max_cgpa,
+                MIN(cgpa) AS min_cgpa
+            FROM students
+        """)
+        summary = cursor.fetchone()
+
+        # Count per branch
+        cursor.execute("""
+            SELECT branch, COUNT(*) AS count
+            FROM students
+            GROUP BY branch
+            ORDER BY count DESC
+        """)
+        by_branch = cursor.fetchall()
+
+        # Count per year
+        cursor.execute("""
+            SELECT year, COUNT(*) AS count
+            FROM students
+            GROUP BY year
+            ORDER BY year
+        """)
+        by_year = cursor.fetchall()
+
+        return {
+            "summary": summary,
+            "by_branch": by_branch,
+            "by_year": by_year,
+        }
+    finally:
+        cursor.close()
+        conn.close()
+
+def get_students_paginated(page=1, per_page=10):
+    """Return a page of students + total count."""
+    conn = get_connection()
+    if not conn:
+        return [], 0
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        # Total count
+        cursor.execute("SELECT COUNT(*) AS total FROM students")
+        total = cursor.fetchone()["total"]
+
+        # Page data
+        offset = (page - 1) * per_page
+        cursor.execute(
+            "SELECT * FROM students ORDER BY id LIMIT %s OFFSET %s",
+            (per_page, offset)
+        )
+        students = cursor.fetchall()
+
+        return students, total
+    finally:
+        cursor.close()
+        conn.close()

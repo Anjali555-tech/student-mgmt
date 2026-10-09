@@ -1,119 +1,230 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
     <title>{% block title %}Student Management{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <meta charset="UTF-8">
     <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, "Segoe UI", Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 0;
-            color: #222;
+        /* ============ THEME VARIABLES ============ */
+        :root {
+            --bg: #f4f6f8;
+            --surface: #ffffff;
+            --text: #222;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --nav-bg: #1e293b;
+            --nav-text: #cbd5e1;
+            --nav-text-hover: #ffffff;
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --hover-row: #f9fafb;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --nav-bg: #020617;
+            --nav-text: #94a3b8;
+            --nav-text-hover: #ffffff;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --hover-row: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --danger: #ef4444;
+            --danger-hover: #f87171;
+            --shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        /* ============ BASE ============ */
+        body {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    transition: background 0.2s, color 0.2s;
+    animation: pageFadeIn 0.3s ease-out;
+}
+
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+        /* ============ NAVBAR ============ */
         nav {
-            background: #1e293b;
+            background: var(--nav-bg);
             padding: 15px 30px;
             display: flex;
             gap: 25px;
             align-items: center;
+            transition: background 0.2s;
         }
         nav a {
-            color: #cbd5e1;
+            color: var(--nav-text);
             text-decoration: none;
             font-weight: 500;
             font-size: 15px;
+            transition: color 0.15s;
         }
-        nav a:hover { color: #fff; }
-        nav .brand { color: #fff; font-size: 18px; font-weight: bold; margin-right: 20px; }
+        nav a:hover { color: var(--nav-text-hover); }
+        nav .brand {
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        nav .spacer { flex: 1; }
+
+        /* ============ THEME TOGGLE BUTTON ============ */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--nav-text);
+            color: var(--nav-text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.15s;
+        }
+        .theme-toggle:hover {
+            border-color: var(--nav-text-hover);
+            color: var(--nav-text-hover);
+        }
+
+        /* ============ LAYOUT ============ */
         .container {
             max-width: 1000px;
             margin: 30px auto;
             padding: 0 20px;
         }
-        h1 { color: #1e293b; }
+        h1 { color: var(--text); }
+
+        /* ============ FLASH MESSAGES ============ */
         .flash {
             padding: 12px 18px;
             border-radius: 6px;
             margin-bottom: 15px;
             font-weight: 500;
+            animation: fadeIn 0.3s ease-in;
         }
         .flash.success { background: #d1fae5; color: #065f46; }
         .flash.error { background: #fee2e2; color: #991b1b; }
+        [data-theme="dark"] .flash.success { background: #064e3b; color: #a7f3d0; }
+        [data-theme="dark"] .flash.error { background: #7f1d1d; color: #fecaca; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ TABLES ============ */
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: var(--surface);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
+            transition: background 0.2s;
         }
         th, td {
             padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border);
         }
         th {
-            background: #1e293b;
+            background: var(--nav-bg);
             color: white;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        tr:hover { background: #f9fafb; }
+        tr:hover { background: var(--hover-row); }
+
+        /* ============ BUTTONS ============ */
         .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            margin-right: 6px;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: all 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: var(--danger-hover); }
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
         }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #b91c1c; }
-        .btn-secondary { background: #e5e7eb; color: #111; }
-        .btn-secondary:hover { background: #d1d5db; }
+        .btn-secondary:hover { opacity: 0.8; }
         .btn-small { padding: 5px 10px; font-size: 12px; }
+
+        /* ============ FORMS ============ */
         form {
-            background: white;
+            background: var(--surface);
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
             max-width: 500px;
+            transition: background 0.2s;
         }
         form label {
             display: block;
             margin-bottom: 6px;
             font-weight: 600;
             font-size: 14px;
-            color: #374151;
+            color: var(--text);
         }
         form input, form select {
             width: 100%;
             padding: 10px 12px;
             margin-bottom: 16px;
-            border: 1px solid #d1d5db;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--input-border);
             border-radius: 6px;
             font-size: 14px;
             font-family: inherit;
         }
         form input:focus, form select:focus {
             outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
         }
+
+        /* ============ EMPTY STATE ============ */
         .empty {
             text-align: center;
             padding: 50px;
-            color: #6b7280;
-            background: white;
+            color: var(--text-muted);
+            background: var(--surface);
             border-radius: 8px;
+            transition: background 0.2s;
         }
     </style>
 </head>
@@ -123,6 +234,9 @@
         <a href="{{ url_for('index') }}">Home</a>
         <a href="{{ url_for('add') }}">Add Student</a>
         <a href="{{ url_for('search') }}">Search</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="spacer"></span>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
     </nav>
 
     <div class="container">
@@ -134,5 +248,48 @@
 
         {% block content %}{% endblock %}
     </div>
+
+    <!-- ============ THEME TOGGLE SCRIPT ============ -->
+    <script>
+        // Apply saved theme on page load — BEFORE page renders
+        (function() {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute("data-theme");
+            const next = current === "dark" ? "light" : "dark";
+
+            html.setAttribute("data-theme", next);
+            localStorage.setItem("theme", next);
+
+            updateToggleIcon(next);
+        }
+
+        function updateToggleIcon(theme) {
+            const btn = document.getElementById("themeToggle");
+            if (btn) btn.textContent = theme === "dark" ? "☀️" : "🌙";
+        }
+
+        // Update icon on load
+        document.addEventListener("DOMContentLoaded", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "light";
+            updateToggleIcon(current);
+        });
+        // ============ AUTO-DISMISS FLASH MESSAGES ============
+    document.addEventListener("DOMContentLoaded", () => {
+        const flashes = document.querySelectorAll(".flash");
+        flashes.forEach((flash, index) => {
+            setTimeout(() => {
+                flash.style.transition = "opacity 0.5s, transform 0.5s";
+                flash.style.opacity = "0";
+                flash.style.transform = "translateY(-10px)";
+                setTimeout(() => flash.remove(), 500);
+            }, 3000 + index * 200);   // 3s + slight stagger per message
+        });
+    });
+    </script>
 </body>
 </html>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>📊 Dashboard</h1>
+
+{% if stats and stats.summary.total > 0 %}
+
+    <!-- Summary cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0;">
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Total Students</div>
+            <div style="font-size: 32px; font-weight: bold; color: #2563eb;">{{ stats.summary.total }}</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Average CGPA</div>
+            <div style="font-size: 32px; font-weight: bold; color: #10b981;">{{ "%.2f"|format(stats.summary.avg_cgpa) }}</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Highest CGPA</div>
+            <div style="font-size: 32px; font-weight: bold; color: #f59e0b;">{{ "%.2f"|format(stats.summary.max_cgpa) }}</div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="color: #6b7280; font-size: 13px; text-transform: uppercase;">Lowest CGPA</div>
+            <div style="font-size: 32px; font-weight: bold; color: #ef4444;">{{ "%.2f"|format(stats.summary.min_cgpa) }}</div>
+        </div>
+    </div>
+
+    <!-- By Branch -->
+    <h2>🏫 By Branch</h2>
+    <table>
+        <thead>
+            <tr><th>Branch</th><th>Count</th><th>Distribution</th></tr>
+        </thead>
+        <tbody>
+            {% for row in stats.by_branch %}
+            <tr>
+                <td><strong>{{ row.branch }}</strong></td>
+                <td>{{ row.count }}</td>
+                <td>
+                    <div style="background: #2563eb; height: 20px; border-radius: 4px; width: {{ row.count * 40 }}px; min-width: 20px;"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- By Year -->
+    <h2 style="margin-top: 30px;">📅 By Year</h2>
+    <table>
+        <thead>
+            <tr><th>Year</th><th>Count</th><th>Distribution</th></tr>
+        </thead>
+        <tbody>
+            {% for row in stats.by_year %}
+            <tr>
+                <td><strong>Year {{ row.year }}</strong></td>
+                <td>{{ row.count }}</td>
+                <td>
+                    <div style="background: #10b981; height: 20px; border-radius: 4px; width: {{ row.count * 40 }}px; min-width: 20px;"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <div class="empty">
+        <h2>No data yet</h2>
+        <p>Add some students first, then come back to see stats.</p>
+        <a href="{{ url_for('add') }}" class="btn btn-primary">➕ Add Student</a>
+    </div>
+{% endif %}
+{% endblock %}

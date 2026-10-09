@@ -1,18 +1,40 @@
+import csv
+import io
+from flask import Response
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from student_dao import (
-    add_student, get_all_students, get_student_by_id,
-    search_students, update_student, delete_student
+    add_student,
+    get_all_students,
+    get_student_by_id,
+    get_students_paginated,
+    search_students,
+    update_student,
+    delete_student,
+    get_statistics,
+    get_students_paginated,
 )
 
 app = Flask(__name__)
-app.secret_key = "change-this-to-something-random"  # Needed for flash messages
+app.secret_key = "change-this-to-something-random"
 
 
 # ---------- HOME: list all students ----------
 @app.route("/")
 def index():
-    students = get_all_students()
-    return render_template("index.html", students=students)
+    page = request.args.get("page", 1, type=int)
+    per_page = 3
+
+    students, total = get_students_paginated(page=page, per_page=per_page)
+    total_pages = (total + per_page - 1) // per_page  # ceil division
+
+    return render_template(
+        "index.html",
+        students=students,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+    )
 
 
 # ---------- ADD ----------
@@ -85,5 +107,39 @@ def search():
     return render_template("search.html", results=results)
 
 
+# ---------- DASHBOARD ----------
+@app.route("/dashboard")
+def dashboard():
+    stats = get_statistics()
+    return render_template("dashboard.html", stats=stats)
+
+# ---------- EXPORT CSV ----------
+@app.route("/export")
+def export_csv():
+    students = get_all_students()
+
+    # Write to an in-memory text buffer
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Header row
+    writer.writerow(["ID", "Name", "Email", "Phone", "Branch", "Year", "CGPA", "Created At"])
+
+    # Data rows
+    for s in students:
+        writer.writerow([
+            s["id"], s["name"], s["email"], s["phone"] or "",
+            s["branch"], s["year"], s["cgpa"] or "", s["created_at"]
+        ])
+
+    output.seek(0)
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=students.csv"
+        }
+    )
 if __name__ == "__main__":
     app.run(debug=True)
